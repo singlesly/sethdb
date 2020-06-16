@@ -7,6 +7,9 @@ import 'reflect-metadata';
 import { EntityOptions } from "../../src/decorator/EntityOptions";
 import { Id } from "../../src/decorator/Id";
 import { IdOptions } from "../../src/decorator/IdOptions";
+import { Property } from "../../src/decorator/Property";
+import { PropertyOptions } from "../../src/decorator/PropertyOptions";
+import exp = require("constants");
 
 describe("Entity test", () => {
     describe("Entity decorator", () => {
@@ -54,6 +57,23 @@ describe("Entity test", () => {
             expect(options).toBeDefined();
             expect(options.localField).toBe("id");
             expect(options.isObjectId).toBe(false);
+        })
+
+        it("should be defined property in metadata", () => {
+            class SubjectClass {
+                @Property()
+                name: string;
+            }
+
+            const options: PropertyOptions[] = Reflect.getMetadata("entity:properties", SubjectClass.prototype);
+
+            expect(options).toBeDefined();
+            expect(options).toHaveLength(1);
+            expect(options[0].property).toBe("name");
+
+            const propOptions = Reflect.getMetadata("entity:property", SubjectClass.prototype, "name");
+
+            expect(options[0]).toEqual(propOptions);
         })
     })
 });
