@@ -18,7 +18,11 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'error',
+    '@typescript-eslint/no-explicit-any': 'error',
+    'no-console': 'error',
+    'max-lines': 'error',
+    'eqeqeq': 'error',
+    'quotes': 'double'
   },
 };
