@@ -17,5 +17,6 @@ export function Id(options?: IdOptions): PropertyDecorator {
         options.localField = propertyKey;
 
         Reflect.defineMetadata("entity:id", options, target.constructor.prototype);
+        Reflect.defineMetadata("entity:id", options, target.constructor.prototype, propertyKey);
     }
 }

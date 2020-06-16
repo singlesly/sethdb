@@ -57,6 +57,9 @@ describe("Entity test", () => {
             expect(options).toBeDefined();
             expect(options.localField).toBe("id");
             expect(options.isObjectId).toBe(false);
+
+            const propOptions = Reflect.getMetadata("entity:id", SubjectClass.prototype, "id");
+            expect(options).toEqual(propOptions);
         })
 
         it("should be defined property in metadata", () => {
