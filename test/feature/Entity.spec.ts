@@ -5,6 +5,8 @@
 import { Entity } from "../../src/decorator/Entity";
 import 'reflect-metadata';
 import { EntityOptions } from "../../src/decorator/EntityOptions";
+import { Id } from "../../src/decorator/Id";
+import { IdOptions } from "../../src/decorator/IdOptions";
 
 describe("Entity test", () => {
     describe("Entity decorator", () => {
@@ -40,5 +42,18 @@ describe("Entity test", () => {
             expect(options).toBeDefined();
             expect(options.name).toBe("subjects");
         });
+
+        it("should be defined id options in metadata", () => {
+            class SubjectClass {
+                @Id()
+                id: string;
+            }
+
+            const options: IdOptions = Reflect.getMetadata("entity:id", SubjectClass.prototype);
+
+            expect(options).toBeDefined();
+            expect(options.localField).toBe("id");
+            expect(options.isObjectId).toBe(false);
+        })
     })
 });
