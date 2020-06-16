@@ -9,7 +9,8 @@ import { Id } from "../../src/decorator/Id";
 import { IdOptions } from "../../src/decorator/IdOptions";
 import { Property } from "../../src/decorator/Property";
 import { PropertyOptions } from "../../src/decorator/PropertyOptions";
-import exp = require("constants");
+import { Reference } from "../../src/decorator/Reference";
+import { ReferenceOptions } from "../../src/decorator/ReferenceOptions";
 
 describe("Entity test", () => {
     describe("Entity decorator", () => {
@@ -77,6 +78,31 @@ describe("Entity test", () => {
             const propOptions = Reflect.getMetadata("entity:property", SubjectClass.prototype, "name");
 
             expect(options[0]).toEqual(propOptions);
+        })
+
+        it("should be defined reference in metadata", () => {
+            class RelatedClass {}
+            class RelatedArrayClass {}
+
+            class SubjectClass {
+                @Property()
+                name: string;
+
+                @Reference()
+                ref: RelatedClass;
+
+                @Reference(RelatedArrayClass)
+                refs: Array<RelatedArrayClass> = [];
+            }
+
+            const references: ReferenceOptions[] = Reflect.getMetadata("entity:references", SubjectClass.prototype);
+
+            expect(references).toHaveLength(2);
+            expect(references[0].property).toBe("ref");
+            expect(references[0].type).toBe(RelatedClass);
+
+            expect(references[1].property).toBe("refs");
+            expect(references[1].type).toBe(RelatedArrayClass);
         })
     })
 });
