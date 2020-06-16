@@ -103,6 +103,12 @@ describe("Entity test", () => {
 
             expect(references[1].property).toBe("refs");
             expect(references[1].type).toBe(RelatedArrayClass);
+
+            const refOptions = Reflect.getMetadata("entity:reference", SubjectClass.prototype, "ref");
+            const refsOptions = Reflect.getMetadata("entity:reference", SubjectClass.prototype, "refs");
+
+            expect(references[0]).toEqual(refOptions);
+            expect(references[1]).toEqual(refsOptions);
         })
     })
 });
