@@ -12,6 +12,7 @@ export function Property(options?: PropertyOptions): PropertyDecorator {
         }
 
         options.property = !options.property ? property : options.property;
+        options.field = property;
 
         Reflect.defineMetadata("entity:properties", [
             ...(Reflect.getMetadata("entity:properties", target.constructor.prototype) || []),
