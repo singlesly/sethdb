@@ -7,6 +7,8 @@ import { Id } from "../../src/decorator/Id";
 import { Property } from "../../src/decorator/Property";
 import { Mapper } from "../../src/mapping/Mapper";
 import { ObjectID } from "mongodb";
+import { Reference } from "../../src/decorator/Reference";
+import { Document } from "../../src/Document";
 
 describe("Mapper test", () => {
 
@@ -34,4 +36,25 @@ describe("Mapper test", () => {
         expect(document.age).toBe(subject.age);
         expect(document.renamed).toBe(subject.origin);
     });
+
+    it("should be map single reference object", () => {
+        @Entity()
+        class ParentClass {
+            @Id() id?: string;
+        }
+
+        @Entity()
+        class SubjectClass {
+            @Id() id?: string;
+            @Reference() parent: ParentClass;
+        }
+
+        const parent = new ParentClass();
+        const subject = new SubjectClass();
+        subject.parent = parent;
+
+        const document = mapper.toDocument(subject).toObject();
+
+        expect(document.parent).toBeInstanceOf(Document);
+    })
 });

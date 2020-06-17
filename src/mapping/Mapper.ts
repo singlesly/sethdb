@@ -7,14 +7,16 @@ import { Document } from "../Document";
 import { PropertyOptions } from "../decorator/PropertyOptions";
 import { IdOptions } from "../decorator/IdOptions";
 import { ObjectID } from "mongodb";
+import { ReferenceOptions } from "../decorator/ReferenceOptions";
 
 export class Mapper {
 
     public toDocument(entity: Object): Document {
         const document = new Document();
 
-        const properties: PropertyOptions[] = Reflect.getMetadata("entity:properties", entity.constructor.prototype);
+        const properties: PropertyOptions[] = Reflect.getMetadata("entity:properties", entity.constructor.prototype) || [];
         const id: IdOptions | null = Reflect.getMetadata("entity:id", entity.constructor.prototype);
+        const references: ReferenceOptions[] = Reflect.getMetadata("entity:references", entity.constructor.prototype) || [];
 
         if(id) {
             const idValue = Reflect.get(entity, id.localField);
@@ -28,6 +30,11 @@ export class Mapper {
         for(const property of properties) {
             const value = Reflect.get(entity, property.field);
             document.add(property.property, value);
+        }
+
+        for(const reference of references) {
+            const value = Reflect.get(entity, reference.property);
+            document.add(reference.property, this.toDocument(value));
         }
 
         return document;
