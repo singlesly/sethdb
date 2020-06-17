@@ -29,6 +29,7 @@ describe("Mapper test", () => {
         const document = mapper.toDocument(subject).toObject();
 
         expect(document._id).toBeInstanceOf(ObjectID);
+        expect(document._id.toHexString()).toBe(subject.id);
         expect(document.name).toBe(subject.name);
         expect(document.age).toBe(subject.age);
         expect(document.renamed).toBe(subject.origin);
