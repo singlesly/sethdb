@@ -5,4 +5,5 @@
  */
 export interface PropertyOptions {
     property?: string;
+    field?: string;
 }
