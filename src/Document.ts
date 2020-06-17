@@ -15,6 +15,10 @@ export class Document {
         return this;
     }
 
+    public get<T = any>(key: string): T|null {
+        return this.document[key];
+    }
+
     public toObject() {
         return this.document;
     }
