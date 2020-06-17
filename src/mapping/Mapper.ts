@@ -36,7 +36,11 @@ export class Mapper {
 
         for(const reference of references) {
             const value = Reflect.get(entity, reference.property);
-            document.add(reference.property, this.toDocument(value).get<ObjectID>("_id"));
+            if(Array.isArray(value)) {
+                document.add(reference.property, value.map(item => this.toDocument(item).get<ObjectID>("_id")));
+            } else  {
+                document.add(reference.property, this.toDocument(value).get<ObjectID>("_id"));
+            }
         }
 
         return document;

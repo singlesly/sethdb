@@ -38,9 +38,10 @@ describe("Mapper test", () => {
     });
 
     it("should be map single reference object", () => {
+        const oid = new ObjectID();
         @Entity()
         class ParentClass {
-            @Id() id?: string;
+            @Id() id: string = oid.toHexString();
         }
 
         @Entity()
@@ -55,6 +56,32 @@ describe("Mapper test", () => {
 
         const document = mapper.toDocument(subject).toObject();
 
-        expect(document.parent).toBeInstanceOf(Document);
+        expect(document.parent).toBeInstanceOf(ObjectID);
+        expect(document.parent.toHexString()).toBe(oid.toHexString());
     })
+
+    it("should be map multiple reference objects", () => {
+        @Entity()
+        class ChildClass {
+            @Id() id?: string;
+        }
+
+        @Entity()
+        class SubjectClass {
+            @Id() id?: string;
+            @Reference(ChildClass) child: ChildClass[] = [];
+        }
+        const subject = new SubjectClass();
+        subject.child = [
+            new ChildClass(),
+            new ChildClass(),
+            new ChildClass()
+        ];
+
+        const document = mapper.toDocument(subject).toObject();
+
+        expect(document.child).toHaveLength(3);
+        expect(document.child.every(child => child instanceof ObjectID)).toBeTruthy();
+
+    });
 });
