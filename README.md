@@ -4,13 +4,13 @@
 
 Annotations
 
-* `@Entity`  
-* `@Property`  
+* `@Entity`  - done
+* `@Property`  - done
 * `@Relation`  
 * `@Embedded`  
 * `@Indexes`  
 * `@Validation`  
-* `@Id`
+* `@Id` - done
 
 DataStore  
 * `save()`  
