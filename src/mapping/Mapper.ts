@@ -24,6 +24,8 @@ export class Mapper {
                 const idObjectId = id.isObjectId ? idValue : new ObjectID(idValue);
 
                 document.add("_id", idObjectId);
+            } else {
+                document.add("_id", new ObjectID());
             }
         }
 
@@ -34,7 +36,7 @@ export class Mapper {
 
         for(const reference of references) {
             const value = Reflect.get(entity, reference.property);
-            document.add(reference.property, this.toDocument(value));
+            document.add(reference.property, this.toDocument(value).get<ObjectID>("_id"));
         }
 
         return document;
