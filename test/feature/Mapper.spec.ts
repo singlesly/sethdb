@@ -129,6 +129,6 @@ describe("Mapper test", () => {
         const document = mapper.toDocument(subject).toObject();
 
         expect(document.child).toHaveLength(3);
-        expect(document.child.every(child => child._id === oid.toHexString())).toBeTruthy();
+        expect(document.child.every(child => child._id.toHexString() === oid.toHexString())).toBeTruthy();
     });
 });
