@@ -24,6 +24,9 @@ export class Document {
             if(value instanceof Document) {
                 this.document[key] = value.toObject();
             }
+            if(Array.isArray(value)) {
+                this.document[key] = value.map(item => item instanceof Document ? item.toObject() : item);
+            }
         });
         return this.document;
     }
