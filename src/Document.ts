@@ -20,6 +20,11 @@ export class Document {
     }
 
     public toObject() {
+        Object.entries(this.document).forEach(([key, value]) => {
+            if(value instanceof Document) {
+                this.document[key] = value.toObject();
+            }
+        });
         return this.document;
     }
 }

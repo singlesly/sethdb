@@ -9,6 +9,7 @@ import { Mapper } from "../../src/mapping/Mapper";
 import { ObjectID } from "mongodb";
 import { Reference } from "../../src/decorator/Reference";
 import { Document } from "../../src/Document";
+import { Embedded } from "../../src/decorator/Embedded";
 
 describe("Mapper test", () => {
 
@@ -83,5 +84,51 @@ describe("Mapper test", () => {
         expect(document.child).toHaveLength(3);
         expect(document.child.every(child => child instanceof ObjectID)).toBeTruthy();
 
+    });
+
+    it("should be map single embedded", () => {
+        const oid = new ObjectID();
+
+        class ChildClass {
+            @Id() id: string = oid.toHexString();
+        }
+
+        @Entity()
+        class SubjectClass {
+            @Id() id?: string;
+            @Embedded() child: ChildClass;
+        }
+        const subject = new SubjectClass();
+        subject.child = new ChildClass();
+
+        const document = mapper.toDocument(subject).toObject();
+
+        expect(document.child._id).toBeInstanceOf(ObjectID);
+        expect(document.child._id.toHexString()).toBe(oid.toHexString());
+    });
+
+    it("should be map multi embedded", () => {
+        const oid = new ObjectID();
+
+        class ChildClass {
+            @Id() id: string = oid.toHexString();
+        }
+
+        @Entity()
+        class SubjectClass {
+            @Id() id?: string;
+            @Embedded(ChildClass) child: ChildClass[] = [];
+        }
+        const subject = new SubjectClass();
+        subject.child = [
+            new ChildClass(),
+            new ChildClass(),
+            new ChildClass()
+        ];
+
+        const document = mapper.toDocument(subject).toObject();
+
+        expect(document.child).toHaveLength(3);
+        expect(document.child.every(child => child._id === oid.toHexString())).toBeTruthy();
     });
 });
