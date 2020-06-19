@@ -8,6 +8,7 @@ import { PropertyOptions } from "../decorator/PropertyOptions";
 import { IdOptions } from "../decorator/IdOptions";
 import { ObjectID } from "mongodb";
 import { ReferenceOptions } from "../decorator/ReferenceOptions";
+import { EmbeddedOptions } from "../decorator/EmbeddedOptions";
 
 export class Mapper {
 
@@ -17,6 +18,7 @@ export class Mapper {
         const properties: PropertyOptions[] = Reflect.getMetadata("entity:properties", entity.constructor.prototype) || [];
         const id: IdOptions | null = Reflect.getMetadata("entity:id", entity.constructor.prototype);
         const references: ReferenceOptions[] = Reflect.getMetadata("entity:references", entity.constructor.prototype) || [];
+        const embeddedParts: EmbeddedOptions[] = Reflect.getMetadata("entity:embedded.parts", entity.constructor.prototype) || [];
 
         if(id) {
             const idValue = Reflect.get(entity, id.localField);
@@ -40,6 +42,15 @@ export class Mapper {
                 document.add(reference.property, value.map(item => this.toDocument(item).get<ObjectID>("_id")));
             } else  {
                 document.add(reference.property, this.toDocument(value).get<ObjectID>("_id"));
+            }
+        }
+
+        for(const embedded of embeddedParts) {
+            const value = Reflect.get(entity, embedded.property);
+            if(Array.isArray(value)) {
+                document.add(embedded.property, value.map(item => this.toDocument(item)));
+            } else  {
+                document.add(embedded.property, this.toDocument(value));
             }
         }
 
