@@ -4,10 +4,23 @@
  * @class Document
  */
 export class Document {
-    private readonly document: Record<string, any> = {};
+    private document: Record<string, any> = {};
 
     constructor(object: Record<string, any> = {}) {
+        this.fromObject(object);
+    }
+
+    private fromObject(object: Record<string, any>) {
         this.document = object;
+
+        Object.entries(this.document).forEach(([key,  value]) => {
+            if(typeof value === 'object' && value !== null) {
+                this.document[key] = new Document(value);
+            }
+            if(Array.isArray(value) && value !== null) {
+                value.map(item => typeof item === 'object' && item !== null ? new Document(object) : item);
+            }
+        });
     }
 
     public add(key: string, value: any): this {

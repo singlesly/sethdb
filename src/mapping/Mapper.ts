@@ -56,4 +56,8 @@ export class Mapper {
 
         return document;
     }
+
+    public toClass<T = any>(document: Document, cls: Function): T {
+        throw new Error("Not implemented");
+    }
 }
