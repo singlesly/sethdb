@@ -131,4 +131,30 @@ describe("Mapper test", () => {
         expect(document.child).toHaveLength(3);
         expect(document.child.every(child => child._id.toHexString() === oid.toHexString())).toBeTruthy();
     });
+
+    it("should be cast object to entity", () => {
+        const oid = new ObjectID("54759eb3c090d83494e2d804")
+        @Entity()
+        class SubjectClass {
+            @Id() id?: string = oid.toHexString();
+            @Property() name: string;
+            @Property() age: number;
+            @Property({ property: "renamed" }) origin: string;
+        }
+
+        const document = new Document({
+           _id: oid,
+            name: "hello",
+            age: 10,
+            renamed: "hi origin"
+        });
+
+        const entity: SubjectClass = mapper.toClass(document, SubjectClass);
+
+        expect(entity).toBeInstanceOf(SubjectClass);
+        expect(entity.id).toBe(oid.toHexString());
+        expect(entity.name).toBe(document.toObject().name);
+        expect(entity.age).toBe(document.toObject().age);
+        expect(entity.origin).toBe(document.toObject().renamed);
+    })
 });
