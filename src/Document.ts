@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 /**
  * @package
  * @author Artem Ilinykh devsinglesly@gmail.com
@@ -14,6 +16,14 @@ export class Document {
         this.document = object;
 
         Object.entries(this.document).forEach(([key,  value]) => {
+            if(value instanceof ObjectId) {
+                this.document[key] = value;
+                return;
+            }
+            if(value instanceof Document) {
+                this.document[key] = value;
+                return;
+            }
             if(typeof value === 'object' && value !== null) {
                 this.document[key] = new Document(value);
             }

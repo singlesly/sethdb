@@ -5,5 +5,6 @@
  */
 export interface ReferenceOptions {
     type?: Function;
+    // class field
     property?: string;
 }

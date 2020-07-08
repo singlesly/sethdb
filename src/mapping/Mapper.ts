@@ -9,6 +9,7 @@ import { IdOptions } from "../decorator/IdOptions";
 import { ObjectID } from "mongodb";
 import { ReferenceOptions } from "../decorator/ReferenceOptions";
 import { EmbeddedOptions } from "../decorator/EmbeddedOptions";
+import { doc } from "prettier";
 
 export class Mapper {
 
@@ -57,7 +58,47 @@ export class Mapper {
         return document;
     }
 
-    public toClass<T = any>(document: Document, cls: Function): T {
-        throw new Error("Not implemented");
+    public toClass<T = any>(document: Record<string, any>, cls: Function): T {
+        const entity = {} as any;
+        Reflect.setPrototypeOf(entity, cls.prototype);
+
+        const properties: PropertyOptions[] = Reflect.getMetadata("entity:properties", cls.prototype) || [];
+        const id: IdOptions | null = Reflect.getMetadata("entity:id", cls.prototype);
+        const references: ReferenceOptions[] = Reflect.getMetadata("entity:references", cls.prototype) || [];
+        const embeddedParts: EmbeddedOptions[] = Reflect.getMetadata("entity:embedded.parts", cls.prototype) || [];
+
+        if(id) {
+            const originIdValue = document["_id"];
+            if(originIdValue) {
+                const idValue = id.isObjectId ? originIdValue : String(originIdValue);
+
+                Reflect.set(entity, id.localField, idValue);
+            }
+        }
+
+        for(const property of properties) {
+            const value = document[property.property];
+            Reflect.set(entity, property.field, value);
+        }
+
+        for(const reference of references) {
+            const value = document[reference.property];
+            if(Array.isArray(value)) {
+                Reflect.set(entity, reference.property, value.map(item => this.toClass(item, reference.type)));
+            } else  {
+                Reflect.set(entity, reference.property, this.toClass(value, reference.type));
+            }
+        }
+
+        for(const embedded of embeddedParts) {
+            const value = document[embedded.property];
+            if(Array.isArray(value)) {
+                Reflect.set(entity, embedded.property, value.map(item => this.toClass(item, embedded.type)));
+            } else  {
+                Reflect.set(entity, embedded.property, this.toClass(value, embedded.type));
+            }
+        }
+
+        return entity as T;
     }
 }

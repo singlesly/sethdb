@@ -4,6 +4,8 @@
  * @interface PropertyOptions
  */
 export interface PropertyOptions {
+    // document field name
     property?: string;
+    // class field name
     field?: string;
 }

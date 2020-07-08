@@ -132,29 +132,51 @@ describe("Mapper test", () => {
         expect(document.child.every(child => child._id.toHexString() === oid.toHexString())).toBeTruthy();
     });
 
-    it("should be cast object to entity", () => {
-        const oid = new ObjectID("54759eb3c090d83494e2d804")
-        @Entity()
-        class SubjectClass {
-            @Id() id?: string = oid.toHexString();
+    it("to document test", () => {
+
+        class E {
             @Property() name: string;
-            @Property() age: number;
-            @Property({ property: "renamed" }) origin: string;
         }
 
-        const document = new Document({
-           _id: oid,
-            name: "hello",
-            age: 10,
-            renamed: "hi origin"
-        });
+        @Entity()
+        class R {
+            @Id() id?: string;
+            @Property() name: string;
+        }
 
-        const entity: SubjectClass = mapper.toClass(document, SubjectClass);
+        @Entity()
+        class ResultTest {
+            @Id() id?: string;
+            @Property() test: string;
+            @Embedded() eSingle: E;
+            @Embedded({type: E}) eArr: E[] = [];
+            @Reference() rSingle: R;
+            @Reference({type: R}) rArr: R;
+        }
 
-        expect(entity).toBeInstanceOf(SubjectClass);
-        expect(entity.id).toBe(oid.toHexString());
-        expect(entity.name).toBe(document.toObject().name);
-        expect(entity.age).toBe(document.toObject().age);
-        expect(entity.origin).toBe(document.toObject().renamed);
+        const mongoDoc = {
+            _id: new ObjectID(),
+            test: "hello world from mongo",
+            eSingle: {
+                name: "hi"
+            },
+            eArr: [
+                { name: "e 1" },
+                { name: "e 2" }
+            ],
+            rSingle: {
+                _id: new ObjectID(),
+                name: "r single"
+            },
+            rArr: [
+                { _id: new ObjectID(), name: "rarr 1" },
+                { _id: new ObjectID(), name: "rarr 2" },
+                { _id: new ObjectID(), name: "rarr 3" },
+            ]
+        };
+
+        const cls = mapper.toClass(mongoDoc, ResultTest);
+
+        expect(cls).toBeDefined();
     })
 });

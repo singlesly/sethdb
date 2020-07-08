@@ -16,7 +16,11 @@ export function Embedded (args?: EmbeddedOptions|Function): PropertyDecorator {
             throw new Error("Please specify type of Embedded");
         }
         if(type === Array) {
-            options.type = args as Function;
+            if(typeof args === 'object') {
+                options.type = args.type;
+            } else {
+                options.type = args as Function;
+            }
         } else {
             options.type = type;
         }
